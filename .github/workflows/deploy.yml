@@ -1,0 +1,40 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+      - name: Build lizaalert_backend image
+        run: docker build -t local/yatodo_bot -f Dockerfile .
+
+      - name: Log in to Yandex Container Registry
+        env:
+          YCR_PRIVATE_KEY: ${{ secrets.YCR_PRIVATE_KEY }}
+        run: echo "$YCR_PRIVATE_KEY" | docker login --username json_key --password-stdin cr.yandex
+
+      - name: Build and Push Docker image
+        run: |
+          docker tag local/yatodo_bot cr.yandex/crpabbati0r6r7i5ee8c/yatodo_bot:latest
+          docker push cr.yandex/crpabbati0r6r7i5ee8c/yatodo_bot:latest
+
+    - name: Run SSH commands
+      uses: appleboy/ssh-action@v0.1.12
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.SSH_PORT || 22 }}
+        script: |
+          docker pull cr.yandex/crpabbati0r6r7i5ee8c/yatodo_bot:latest  # Замените на ваш Docker образ
+          docker stop yatodo_bot || true
+          docker rm yatodo_bot || true
+          docker run -d --name yatodo_bot --env-file /apps/yatodo_bot/env -p 8080:8000 cr.yandex/crpabbati0r6r7i5ee8c/yatodo_bot:latest
