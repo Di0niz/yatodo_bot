@@ -3,7 +3,7 @@ from aiogram.types import Message
 from sqlmodel import select
 
 from app.db import context_session
-from app.schemas.events import Event, SubscribeUser
+from app.models.events import Event, SubscribeUser
 
 router = Router()
 

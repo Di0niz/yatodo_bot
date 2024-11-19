@@ -37,4 +37,4 @@ jobs:
           docker pull cr.yandex/crpabbati0r6r7i5ee8c/yatodo_bot:latest  # Замените на ваш Docker образ
           docker stop yatodo_bot || true
           docker rm yatodo_bot || true
-          docker run -d --name yatodo_bot --env-file /apps/yatodo_bot/env -p 8080:8000 cr.yandex/crpabbati0r6r7i5ee8c/yatodo_bot:latest
+          docker run -d --name yatodo_bot --env-file /apps/yatodo_bot/.env -p 8000:8000 cr.yandex/crpabbati0r6r7i5ee8c/yatodo_bot:latest
