@@ -1,6 +1,12 @@
 from datetime import datetime
+from enum import Enum
 
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, Relationship
+
+
+class EventType(str, Enum):
+    WEBINAR = "webinar"
+    MENTOR_SESSION = "mentor_session"
 
 
 class Event(SQLModel, table=True):
@@ -11,6 +17,9 @@ class Event(SQLModel, table=True):
     name: str = Field(nullable=False)
     date: datetime
     description: str
+    type: EventType = Field(nullable=False)  # Тип события: webinar или mentor_session
+
+    slots: list = Relationship(back_populates="event")
 
 class SubscribeUser(SQLModel, table=True):
     class Meta:

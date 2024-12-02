@@ -3,9 +3,9 @@ import datetime
 from fastapi import APIRouter, BackgroundTasks
 from sqlmodel import select
 
-from app.schemas.events import Event
 from app.db import SessionDep
-from app.schemas.events import SubscribeUser, Event
+from app.models.events import SubscribeUser, Event as EventSchema
+from app.schemas import Event
 from bot.loader import bot
 
 router = APIRouter()
@@ -16,8 +16,8 @@ async def schedule_event(event: Event, background_tasks: BackgroundTasks, sessio
     """Планирует рассылку уведомлений всем зарегистрированным пользователям."""
     delay = (event.event_time - datetime.datetime.now()).total_seconds()
 
-    event = session.exec(select(Event).where(Event.name == "test_event")).first()
-    users = session.exec(select(SubscribeUser).where(SubscribeUser.event_id == event.id))
+    event_db = session.exec(select(EventSchema).where(EventSchema.name == "test_event")).first()
+    users = session.exec(select(SubscribeUser).where(SubscribeUser.event_id == event_db.id))
 
     if delay > 0:
         for user in users:
@@ -29,4 +29,4 @@ async def schedule_event(event: Event, background_tasks: BackgroundTasks, sessio
 async def send_notification(chat_id: int, message: str, delay: float):
     """Отправляет уведомление после указанной задержки."""
     # await asyncio.sleep(delay)
-    await bot.send_message(chat_id, message, parse_mode="HTML")
+    await bot.send_message(chat_id, message, disable_notification=False, parse_mode="HTML")
