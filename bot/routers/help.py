@@ -10,9 +10,10 @@ async def send_help(message: Message):
     help_text = """
 Доступные команды:
 /start - Начать работу с ботом
-/slots - Посмотреть список доступных слотов
-/cancel_booking - Отменить запись
-/help - Показать это сообщение
 """
+
+    # /slots - Посмотреть список доступных слотов
+    # /cancel_booking - Отменить запись
+    # /help - Показать это сообщение
 
     await message.answer(help_text)
